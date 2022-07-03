@@ -85,7 +85,8 @@ deploy:
     - job: test
       artifacts: false
   before_script:
-    - apt-get update && apt-get install -y git
+    - apt-get update && apt-get install -y
+      build-essential curl git ruby-dev
     - gem install dpl --pre --version 2.0.3.beta.3
   script:
     - dpl heroku api --api-key $HEROKU_API_KEY
