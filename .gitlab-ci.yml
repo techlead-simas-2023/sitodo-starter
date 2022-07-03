@@ -20,6 +20,7 @@ variables:
     -DinstallAtEnd=true
     -DdeployAtEnd=true
   SAST_JAVA_VERSION: 17
+  HEROKU_APP_NAME: sitodo-example
   DEPLOY_PRODUCTION_URL: https://sitodo-example.herokuapp.com
 
 # Check the list of available templates at https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates
@@ -78,18 +79,17 @@ test:
 
 deploy:
   stage: deploy
-  image: docker.io/library/ruby:3.1.2-slim-bullseye
+  image: docker.io/library/ruby:2.7.5-alpine3.14
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   needs:
     - job: test
       artifacts: false
   before_script:
-    - apt-get update && apt-get install -y
-      build-essential curl git ruby-dev
-    - gem install dpl --pre --version 2.0.3.beta.3
+    - apk add --no-cache build-base curl git ruby-dev
+    - gem install 'dpl:2.0.3.beta.3'
   script:
-    - dpl heroku api --api-key $HEROKU_API_KEY
+    - dpl heroku api --api-key $HEROKU_API_KEY --app $HEROKU_APP_NAME
   environment:
     name: production
     deployment_tier: production
