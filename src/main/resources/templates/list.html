@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Sitodo</title>
+</head>
+<body>
+<h1>Your Todo List</h1>
+<form action="#" th:action="@{${id_list != null} ? '/list/' + ${id_list} : '/list'}" method="post">
+    <input type="text" id="id_new_item" name="item_text" placeholder="Enter an item"/>
+</form>
+<table id="id_list_table">
+    <tr th:if="${items != null}" th:each="item : ${items}">
+        <td th:text="${item.title}"></td>
+    </tr>
+</table>
+</body>
+</html>
