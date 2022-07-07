@@ -23,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @WebMvcTest(TodoListController.class)
-@DisplayName("TodoListController")
 @Tag("unit")
 class TodoListControllerTest {
 
