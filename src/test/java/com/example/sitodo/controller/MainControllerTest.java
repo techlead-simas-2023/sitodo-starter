@@ -20,8 +20,9 @@ class MainControllerTest {
     @Test
     @DisplayName("HTTP GET '/' redirects to '/list")
     void showMainPage_resolvesToIndex() throws Exception {
-        mockMvc.perform(get("/"))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/list"));
+        mockMvc.perform(get("/")).andExpectAll(
+            status().is3xxRedirection(),
+            redirectedUrl("/list")
+        );
     }
 }

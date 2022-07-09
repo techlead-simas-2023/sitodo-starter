@@ -35,21 +35,23 @@ class TodoListControllerTest {
     @Test
     @DisplayName("HTTP GET '/list' retrieves list view")
     void showList_resolvesToIndex() throws Exception {
-        mockMvc.perform(get("/list"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
-            .andExpect(content().encoding(UTF_8))
-            .andExpect(view().name("list"));
+        mockMvc.perform(get("/list")).andExpectAll(
+            status().isOk(),
+            content().contentTypeCompatibleWith(TEXT_HTML),
+            content().encoding(UTF_8),
+            view().name("list")
+        );
     }
 
     @Test
     @DisplayName("HTTP GET '/list' returns an HTML page")
     void showList_returnsHtml() throws Exception {
-        mockMvc.perform(get("/list"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
-            .andExpect(content().encoding(UTF_8))
-            .andExpect(content().string(containsString("</html>")));
+        mockMvc.perform(get("/list")).andExpectAll(
+            status().isOk(),
+            content().contentTypeCompatibleWith(TEXT_HTML),
+            content().encoding(UTF_8),
+            content().string(containsString("</html>"))
+        );
     }
 
     @Test
@@ -57,13 +59,14 @@ class TodoListControllerTest {
     void showList_byId_returnsHtml() throws Exception {
         when(todoListService.getTodoListById(anyLong())).thenReturn(new TodoList(List.of(new Item("Buy milk"))));
 
-        mockMvc.perform(get("/list/1"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
-            .andExpect(content().encoding(UTF_8))
-            .andExpect(content().string(containsString("<table")))
-            .andExpect(content().string(containsString("<tr")))
-            .andExpect(content().string(containsString("Buy milk")))
-            .andExpect(content().string(containsString("</html>")));
+        mockMvc.perform(get("/list/1")).andExpectAll(
+            status().isOk(),
+            content().contentTypeCompatibleWith(TEXT_HTML),
+            content().encoding(UTF_8),
+            content().string(containsString("<table")),
+            content().string(containsString("<tr")),
+            content().string(containsString("Buy milk")),
+            content().string(containsString("</html>"))
+        );
     }
 }
