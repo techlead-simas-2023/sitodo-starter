@@ -8,6 +8,8 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -23,6 +25,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Tag("e2e")
 class AddTodoItemTest extends BaseFunctionalTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AddTodoItemTest.class);
+
+    private static final Duration DEFAULT_WAIT = Duration.ofSeconds(5);
+
     @Test
     @DisplayName("An user can create a single todo item")
     void addTodoItem_single() {
@@ -30,8 +36,7 @@ class AddTodoItemTest extends BaseFunctionalTest {
         checkOverallPageLayout();
 
         // Create a new item
-        WebElement inputField = driver.findElement(By.id("id_new_item"));
-        inputField.sendKeys("Buy milk", Keys.ENTER);
+        postNewTodoItem("Buy milk");
 
         // See the list for the newly inserted item
         checkItemsInList(List.of("Buy milk"));
@@ -48,8 +53,7 @@ class AddTodoItemTest extends BaseFunctionalTest {
         checkOverallPageLayout();
 
         // Create a new item
-        WebElement inputField = driver.findElement(By.id("id_new_item"));
-        inputField.sendKeys("Buy milk", Keys.ENTER);
+        postNewTodoItem("Buy milk");
 
         // See the list for the newly inserted item
         checkItemsInList(List.of("Buy milk"));
@@ -59,8 +63,7 @@ class AddTodoItemTest extends BaseFunctionalTest {
         assertTrue(currentUrl.matches(".+/list/\\d+$"), "The URL was: " + currentUrl);
 
         // Create another item
-        inputField = driver.findElement(By.id("id_new_item"));
-        inputField.sendKeys("Cut grass", Keys.ENTER);
+        postNewTodoItem("Cut grass");
 
         // See the list again to see the new items
         checkItemsInList(List.of("Buy milk", "Cut grass"));
@@ -76,9 +79,7 @@ class AddTodoItemTest extends BaseFunctionalTest {
         driver.get(createBaseUrl("localhost", serverPort));
         checkOverallPageLayout();
 
-        WebElement inputField = driver.findElement(By.id("id_new_item"));
-        inputField.sendKeys("Buy milk", Keys.ENTER);
-
+        postNewTodoItem("Buy milk");
         checkItemsInList(List.of("Buy milk"));
 
         String firstUrl = driver.getCurrentUrl();
@@ -88,9 +89,7 @@ class AddTodoItemTest extends BaseFunctionalTest {
         driver.get(createBaseUrl("localhost", serverPort));
         checkOverallPageLayout();
 
-        inputField = driver.findElement(By.id("id_new_item"));
-        inputField.sendKeys("Buy coffee", Keys.ENTER);
-
+        postNewTodoItem("Buy coffee");
         checkItemsInList(List.of("Buy coffee"));
 
         String secondUrl = driver.getCurrentUrl();
@@ -100,9 +99,16 @@ class AddTodoItemTest extends BaseFunctionalTest {
         assertNotEquals(firstUrl, secondUrl, "Both lists must not have the same URL");
     }
 
+    private void postNewTodoItem(String item) {
+        WebElement inputField = new WebDriverWait(driver, DEFAULT_WAIT)
+            .until(ExpectedConditions.elementToBeClickable(By.tagName("input")));
+
+        inputField.sendKeys(item, Keys.ENTER);
+    }
+
     private void checkOverallPageLayout() {
-        WebElement heading = driver.findElement(By.tagName("h1"));
-        WebElement inputField = driver.findElement(By.id("id_new_item"));
+        WebElement heading = driver.findElement(By.tagName("caption"));
+        WebElement inputField = driver.findElement(By.tagName("input"));
         String headingText = heading.getText();
         String placeholderText = inputField.getAttribute("placeholder");
 
@@ -111,16 +117,31 @@ class AddTodoItemTest extends BaseFunctionalTest {
     }
 
     private void checkItemsInList(List<String> expectedItems) {
-        List<WebElement> rows = new WebDriverWait(driver, Duration.ofSeconds(3))
-            .until(ExpectedConditions.numberOfElementsToBe(By.tagName("tr"), expectedItems.size()));
+        try {
+            // Introduce artificial delay to allow DOM to be correctly rendered after inserting
+            // multiple items consecutively
+            Thread.sleep(500);
+        } catch (InterruptedException exception) {
+            LOG.error("There was a problem during artificial delay", exception);
+        }
 
-        assertEquals(expectedItems.size(), rows.size(), "There are " + rows.size() + " items in the rendered list");
+        List<WebElement> rows = new WebDriverWait(driver, DEFAULT_WAIT)
+            .until(ExpectedConditions.presenceOfNestedElementsLocatedBy(
+                By.tagName("tbody"),
+                By.tagName("tr"))
+            );
 
-        assertTrue(
-            rows.stream()
-                .map(WebElement::getText)
-                .allMatch(expectedItems::contains),
-            "Mismatched todo items"
-        );
+        assertEquals(expectedItems.size(), rows.size(), "There were " + rows.size() + " items in the list");
+
+        rows.forEach(row -> {
+            List<WebElement> columns = row.findElements(By.tagName("td"));
+
+            assertTrue(
+                columns.stream()
+                    .map(WebElement::getText)
+                    .anyMatch(expectedItems::contains),
+                "There were mismatched items"
+            );
+        });
     }
 }
