@@ -1,4 +1,10 @@
 ---
+checks:
+  method-complexity:
+    enabled: true
+    config:
+      threshold: 7
+
 plugins:
   sonar-java:
     enabled: true
