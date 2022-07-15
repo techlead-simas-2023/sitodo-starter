@@ -1,6 +1,6 @@
 package com.example.sitodo.controller;
 
-import com.example.sitodo.model.Item;
+import com.example.sitodo.model.TodoItem;
 import com.example.sitodo.model.TodoList;
 import com.example.sitodo.service.TodoListService;
 import org.slf4j.Logger;
@@ -25,17 +25,20 @@ public class TodoListController {
     }
 
     @GetMapping("/list")
-    public String showList() {
+    public String showList(TodoList todoList, Model model) {
+        model.addAttribute("todoList", todoList);
+        model.addAttribute("motivationMessage", todoListService.computeMotivationMessage(todoList));
+
         return "list";
     }
 
     @GetMapping("/list/{id}")
     public String showList(@PathVariable("id") Long id, Model model) {
         try {
-            TodoList found = todoListService.getTodoListById(id);
+            TodoList foundTodoList = todoListService.getTodoListById(id);
 
-            model.addAttribute("items", found.getItems());
-            model.addAttribute("id_list", id);
+            model.addAttribute("todoList", foundTodoList);
+            model.addAttribute("motivationMessage", todoListService.computeMotivationMessage(foundTodoList));
 
             return "list";
         } catch (NoSuchElementException exception) {
@@ -50,17 +53,35 @@ public class TodoListController {
     public String newItem(@RequestParam("item_text") String item) {
         LOG.debug("New item: {}", item);
 
-        TodoList saved = todoListService.addTodoItem(new Item(item));
+        TodoList saved = todoListService.addTodoItem(new TodoItem(item));
 
-        return "redirect:/list/" + saved.getId();
+        LOG.debug("New item ID: {}", saved.getId());
+
+        return redirectToList(saved.getId());
     }
 
     @PostMapping("/list/{id}")
-    public String newItem(@PathVariable(value = "id") Long id, @RequestParam("item_text") String item) {
+    public String newItem(@PathVariable("id") Long id,
+                          @RequestParam("item_text") String item) {
         LOG.debug("New item: {}", item);
 
-        TodoList saved = todoListService.addTodoItem(id, new Item(item));
+        TodoList saved = todoListService.addTodoItem(id, new TodoItem(item));
 
-        return "redirect:/list/" + saved.getId();
+        LOG.debug("New item ID: {}", saved.getId());
+
+        return redirectToList(saved.getId());
+    }
+
+    @GetMapping("/list/{list_id}/update/{item_id}")
+    public String updateItem(@PathVariable("list_id") Long listId,
+                             @PathVariable("item_id") Long itemId,
+                             @RequestParam("finished") Boolean finished) {
+        TodoList updated = todoListService.updateTodoItem(listId, itemId, finished);
+
+        return redirectToList(updated.getId());
+    }
+
+    private String redirectToList(Long id) {
+        return String.format("redirect:/list/%d", id);
     }
 }

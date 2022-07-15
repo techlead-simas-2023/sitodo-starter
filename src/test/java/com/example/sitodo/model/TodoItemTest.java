@@ -6,20 +6,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("unit")
-class ItemTest {
+class TodoItemTest {
 
     @Test
     void testEquals() {
-        Item first = new Item("Buy milk");
-        Item second = new Item("Cut grass");
+        TodoItem first = new TodoItem("Buy milk");
+        TodoItem second = new TodoItem("Cut grass");
 
         assertNotEquals(first, second);
     }
 
     @Test
     void testHashCode() {
-        Item first = new Item("Buy milk");
-        Item second = new Item("Cut grass");
+        TodoItem first = new TodoItem("Buy milk");
+        TodoItem second = new TodoItem("Cut grass");
 
         assertNotEquals(first.hashCode(), second.hashCode());
     }

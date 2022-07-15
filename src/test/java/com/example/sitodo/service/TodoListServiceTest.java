@@ -1,6 +1,6 @@
 package com.example.sitodo.service;
 
-import com.example.sitodo.model.Item;
+import com.example.sitodo.model.TodoItem;
 import com.example.sitodo.model.TodoList;
 import com.example.sitodo.repository.TodoListRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ class TodoListServiceTest {
     @Test
     @DisplayName("Given an existing ID, getTodoListById returns an existing list")
     void getTodoListById_ok() {
-        Item todoItem = new Item("Buy milk");
+        TodoItem todoItem = new TodoItem("Buy milk");
         TodoList todoList = new TodoList(List.of(todoItem));
         when(todoListRepository.findById(anyLong())).thenReturn(Optional.of(todoList));
 
@@ -49,13 +49,13 @@ class TodoListServiceTest {
     @Test
     @DisplayName("Given a new todo item, addTodoItem saves the item into a new list")
     void addTodoItem_ok() {
-        Item todoItem = new Item("Buy milk");
+        TodoItem todoItem = new TodoItem("Buy milk");
         when(todoListRepository.save(any(TodoList.class))).thenReturn(new TodoList(List.of(todoItem)));
 
         TodoList savedList = todoListService.addTodoItem(todoItem);
-        Item savedItem = savedList.getItems().get(0);
+        TodoItem savedTodoItem = savedList.getItems().get(0);
 
         assertFalse(savedList.getItems().isEmpty());
-        assertEquals("Buy milk", savedItem.getTitle());
+        assertEquals("Buy milk", savedTodoItem.getTitle());
     }
 }

@@ -4,16 +4,10 @@ import io.github.bonigarcia.seljup.SeleniumJupiter;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,12 +19,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Tag("e2e")
 class AddTodoItemTest extends BaseFunctionalTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AddTodoItemTest.class);
-
-    private static final Duration DEFAULT_WAIT = Duration.ofSeconds(5);
-
     @Test
-    @DisplayName("An user can create a single todo item")
+    @DisplayName("A user can create a single todo item")
     void addTodoItem_single() {
         driver.get(createBaseUrl("localhost", serverPort));
         checkOverallPageLayout();
@@ -47,7 +37,7 @@ class AddTodoItemTest extends BaseFunctionalTest {
     }
 
     @Test
-    @DisplayName("An user can create multiple todo items")
+    @DisplayName("A user can create multiple todo items")
     void addTodoItem_multiple() {
         driver.get(createBaseUrl("localhost", serverPort));
         checkOverallPageLayout();
@@ -73,7 +63,7 @@ class AddTodoItemTest extends BaseFunctionalTest {
     }
 
     @Test
-    @DisplayName("An user can create two todo lists consecutively")
+    @DisplayName("A user can create two todo lists consecutively")
     void addTodoItem_twoUsers() {
         // First list
         driver.get(createBaseUrl("localhost", serverPort));
@@ -99,13 +89,6 @@ class AddTodoItemTest extends BaseFunctionalTest {
         assertNotEquals(firstUrl, secondUrl, "Both lists must not have the same URL");
     }
 
-    private void postNewTodoItem(String item) {
-        WebElement inputField = new WebDriverWait(driver, DEFAULT_WAIT)
-            .until(ExpectedConditions.elementToBeClickable(By.tagName("input")));
-
-        inputField.sendKeys(item, Keys.ENTER);
-    }
-
     private void checkOverallPageLayout() {
         WebElement heading = driver.findElement(By.tagName("caption"));
         WebElement inputField = driver.findElement(By.tagName("input"));
@@ -114,34 +97,5 @@ class AddTodoItemTest extends BaseFunctionalTest {
 
         assertEquals("Your Todo List", heading.getText(), "The heading title was: " + headingText);
         assertEquals("Enter an item", inputField.getAttribute("placeholder"), "The placeholder text was: " + placeholderText);
-    }
-
-    private void checkItemsInList(List<String> expectedItems) {
-        try {
-            // Introduce artificial delay to allow DOM to be correctly rendered after inserting
-            // multiple items consecutively
-            Thread.sleep(500);
-        } catch (InterruptedException exception) {
-            LOG.error("There was a problem during artificial delay", exception);
-        }
-
-        List<WebElement> rows = new WebDriverWait(driver, DEFAULT_WAIT)
-            .until(ExpectedConditions.presenceOfNestedElementsLocatedBy(
-                By.tagName("tbody"),
-                By.tagName("tr"))
-            );
-
-        assertEquals(expectedItems.size(), rows.size(), "There were " + rows.size() + " items in the list");
-
-        rows.forEach(row -> {
-            List<WebElement> columns = row.findElements(By.tagName("td"));
-
-            assertTrue(
-                columns.stream()
-                    .map(WebElement::getText)
-                    .anyMatch(expectedItems::contains),
-                "There were mismatched items"
-            );
-        });
     }
 }
