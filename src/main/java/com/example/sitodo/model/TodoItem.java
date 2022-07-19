@@ -19,6 +19,11 @@ public class TodoItem {
     protected TodoItem() { }
 
     public TodoItem(String title) {
+        this(null, title);
+    }
+
+    public TodoItem(Long id, String title) {
+        this.id = id;
         this.title = title;
     }
 
@@ -28,10 +33,6 @@ public class TodoItem {
 
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public Boolean getFinished() {

@@ -28,10 +28,6 @@ public class TodoList {
         return items;
     }
 
-    public void setItems(List<TodoItem> todoItems) {
-        this.items = todoItems;
-    }
-
     public void addTodoItem(TodoItem todoItem) {
         this.items.add(todoItem);
     }
