@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class Item {
+public class TodoItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -13,9 +13,12 @@ public class Item {
     @Column(nullable = false)
     private String title;
 
-    protected Item() { }
+    @Column
+    private Boolean finished = Boolean.FALSE;
 
-    public Item(String title) {
+    protected TodoItem() { }
+
+    public TodoItem(String title) {
         this.title = title;
     }
 
@@ -31,16 +34,24 @@ public class Item {
         this.title = title;
     }
 
+    public Boolean getFinished() {
+        return finished;
+    }
+
+    public void setFinished(Boolean finished) {
+        this.finished = finished;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Item item = (Item) o;
-        return Objects.equals(id, item.id) && title.equals(item.title);
+        TodoItem todoItem = (TodoItem) o;
+        return Objects.equals(id, todoItem.id) && title.equals(todoItem.title) && finished.equals(todoItem.finished);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title);
+        return Objects.hash(id, title, finished);
     }
 }

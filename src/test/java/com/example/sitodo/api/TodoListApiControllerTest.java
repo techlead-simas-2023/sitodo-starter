@@ -1,6 +1,6 @@
 package com.example.sitodo.api;
 
-import com.example.sitodo.model.Item;
+import com.example.sitodo.model.TodoItem;
 import com.example.sitodo.model.TodoList;
 import com.example.sitodo.service.TodoListService;
 import org.junit.jupiter.api.Tag;
@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -34,23 +33,23 @@ class TodoListApiControllerTest {
 
     @Test
     void getTodoList_byId_exists() throws Exception {
-        when(todoListService.getTodoListById(anyLong())).thenReturn(new TodoList(List.of(new Item("Buy milk"))));
+        when(todoListService.getTodoListById(anyLong())).thenReturn(new TodoList(List.of(new TodoItem("Buy milk"))));
 
         mockMvc.perform(get("/api/list/1")).andExpectAll(
             status().isOk(),
             content().contentType(MediaType.APPLICATION_JSON),
-            jsonPath("$.data.items[0].title").value("Buy milk")
+            jsonPath("$.list.items[0].title").value("Buy milk")
         );
     }
 
     @Test
     void newTodoList_ok() throws Exception {
-        when(todoListService.addTodoItem(any(Item.class))).thenReturn(new TodoList(List.of(new Item("Buy milk"))));
+        when(todoListService.addTodoItem(any(TodoItem.class))).thenReturn(new TodoList(List.of(new TodoItem("Buy milk"))));
 
         mockMvc.perform(post("/api/list").content("{\"title\":\"Buy milk\"}")).andExpectAll(
             status().isOk(),
             content().contentType(MediaType.APPLICATION_JSON),
-            jsonPath("$.data.items[0].title").value("Buy milk")
+            jsonPath("$.list.items[0].title").value("Buy milk")
         );
     }
 }

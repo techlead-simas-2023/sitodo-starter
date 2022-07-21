@@ -153,6 +153,7 @@ spotbugs-sast:
 
 # Override code_quality job from the template through the environment variables
 code_quality:
+  allow_failure: false
   variables:
     CODE_QUALITY_IMAGE: "registry.gitlab.com/gitlab-org/ci-cd/codequality:0.85.27"
 
