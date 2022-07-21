@@ -12,11 +12,11 @@ public class TodoList {
     private Long id;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<TodoItem> items;
+    private List<Item> items;
 
     protected TodoList() { }
 
-    public TodoList(List<TodoItem> items) {
+    public TodoList(List<Item> items) {
         this.items = items;
     }
 
@@ -24,16 +24,16 @@ public class TodoList {
         return id;
     }
 
-    public List<TodoItem> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(List<TodoItem> todoItems) {
-        this.items = todoItems;
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 
-    public void addTodoItem(TodoItem todoItem) {
-        this.items.add(todoItem);
+    public void addItem(Item item) {
+        this.items.add(item);
     }
 
     @Override

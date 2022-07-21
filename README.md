@@ -30,12 +30,6 @@ To build an executable Spring Boot application, execute:
 mvn package -DskipTests
 ```
 
-> The `-DskipTests` option lets `package` task to build the app into executable
-> JAR file without running all test suites. If the option was omitted, then
-> all test suites will run, thus increasing the duration of build process,
-> especially the functional test suite that run much longer than the unit test
-> suite.
-
 The JAR file will be generated at [`./target`](./target) directory. To run it,
 execute:
 

@@ -12,16 +12,16 @@ class TodoListTest {
 
     @Test
     void testEquals() {
-        TodoList first = new TodoList(List.of(new TodoItem("Buy milk")));
-        TodoList second = new TodoList(List.of(new TodoItem("Buy milk"), new TodoItem("Cut grass")));
+        TodoList first = new TodoList(List.of(new Item("Buy milk")));
+        TodoList second = new TodoList(List.of(new Item("Buy milk"), new Item("Cut grass")));
 
         assertNotEquals(first, second);
     }
 
     @Test
     void testHashCode() {
-        TodoList first = new TodoList(List.of(new TodoItem("Buy milk")));
-        TodoList second = new TodoList(List.of(new TodoItem("Buy milk"), new TodoItem("Cut grass")));
+        TodoList first = new TodoList(List.of(new Item("Buy milk")));
+        TodoList second = new TodoList(List.of(new Item("Buy milk"), new Item("Cut grass")));
 
         assertNotEquals(first.hashCode(), second.hashCode());
     }

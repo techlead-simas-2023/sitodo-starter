@@ -11,9 +11,9 @@
 <body>
 <div class="container">
     <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-        <a th:href="@{${todoList.id != null} ? '/list/' + ${todoList.id} : '/list'}"
+        <a th:href="@{${id_list != null} ? '/list/' + ${id_list} : '/list'}"
            class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-            <img class="bi me-2" src="/images/logo_placeholder.png" width="160" height="40" alt="logo"/>
+            <img class="bi me-2" src="/images/logo_placeholder.png" width="160" height="40"/>
             <span class="fs-4">SITODO</span>
         </a>
     </header>
@@ -22,39 +22,20 @@
         <thead class="table-dark">
         <tr>
             <th scope="col">ID</th>
-            <th scope="col">Title</th>
+            <th scope="col">Task</th>
             <th scope="col">Status</th>
-            <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:if="${todoList.id != null}" th:each="item : ${todoList.items}">
-            <td th:text="${item.id}">1</td>
-            <td th:text="${item.title}">Cook rice</td>
-            <td th:text="${item.finished} ? 'Finished' : 'Not Finished'">Not Finished</td>
-            <td th:if="${item.finished}">
-                <a class="sitodo-finish-link" th:href="@{/list/{list_id}/update/{item_id}(list_id=${todoList.id},item_id=${item.id},finished='false')}">
-                    <span>Mark as 'Not Finished'</span>
-                </a>
-            </td>
-            <td th:unless="${item.finished}">
-                <a class="sitodo-finish-link" th:href="@{/list/{list_id}/update/{item_id}(list_id=${todoList.id},item_id=${item.id},finished='true')}">
-                    <span>Mark as 'Finished'</span>
-                </a>
-            </td>
+        <tr th:if="${items != null}" th:each="item : ${items}">
+            <td>TODO</td>
+            <td th:text="${item.title}"></td>
+            <td>TODO</td>
         </tr>
         </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="4">
-                <p id="motivation_message" th:text="${motivationMessage}">A motivation message</p>
-            </td>
-        </tr>
-        </tfoot>
     </table>
-    <form th:action="@{${todoList.id != null} ? '/list/' + ${todoList.id} : '/list'}" method="post">
+    <form th:action="@{${id_list != null} ? '/list/' + ${id_list} : '/list'}" method="post">
         <input type="text" id="id_new_item" name="item_text" placeholder="Enter an item"/>
-        <button type="submit" class="btn btn-primary btn-sm">Enter</button>
     </form>
 </div>
 <script th:src="@{/webjars/bootstrap/5.1.3/dist/js/bootstrap.bundle.js}"></script>
