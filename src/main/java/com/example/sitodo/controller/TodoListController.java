@@ -34,12 +34,19 @@ public class TodoListController {
 
     @GetMapping("/list/{id}")
     public String showList(@PathVariable("id") Long id, Model model) {
-        TodoList foundTodoList = todoListService.getTodoListById(id);
+        try {
+            TodoList foundTodoList = todoListService.getTodoListById(id);
 
-        model.addAttribute("todoList", foundTodoList);
-        model.addAttribute("motivationMessage", todoListService.computeMotivationMessage(foundTodoList));
+            model.addAttribute("todoList", foundTodoList);
+            model.addAttribute("motivationMessage", todoListService.computeMotivationMessage(foundTodoList));
 
-        return "list";
+            return "list";
+        } catch (NoSuchElementException exception) {
+            // TODO Implement error handling
+            LOG.warn(exception.getMessage());
+
+            return "404";
+        }
     }
 
     @PostMapping("/list")
@@ -72,11 +79,6 @@ public class TodoListController {
         TodoList updated = todoListService.updateTodoItem(listId, itemId, finished);
 
         return redirectToList(updated.getId());
-    }
-
-    @ExceptionHandler
-    public String handleException(NoSuchElementException exception) {
-        return "404";
     }
 
     private String redirectToList(Long id) {

@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
@@ -74,16 +73,6 @@ class TodoListControllerTest {
             content().string(containsString("<tr")),
             content().string(containsString("Buy milk")),
             content().string(containsString("</html>"))
-        );
-    }
-
-    @Test
-    @DisplayName("Suppose the given ID does not exist, HTTP GET '/list/{id}' returns an error page")
-    void showList_byId_notFound() throws Exception {
-        when(todoListService.getTodoListById(anyLong())).thenThrow(NoSuchElementException.class);
-
-        mockMvc.perform(get("/list/1")).andExpectAll(
-            content().string(containsString("Not Found"))
         );
     }
 
