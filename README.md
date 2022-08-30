@@ -3,15 +3,40 @@
 [![pipeline status](https://gitlab.com/addianto/sitodo/badges/main/pipeline.svg)](https://gitlab.com/addianto/sitodo/-/commits/main)
 [![coverage report](https://gitlab.com/addianto/sitodo/badges/main/coverage.svg)](https://gitlab.com/addianto/sitodo/-/commits/main)
 
-A basic todo app for teaching basic Web programming, Git workflows, and CI/CD.
-Heavily inspired by the running example in "Test-Driven Development with Python"
-book by Harry Percival.
+A basic todo app project for teaching basic Web programming, Git workflows, and
+CI/CD. Heavily inspired by the running example in "Test-Driven Development with
+Python" book by Harry Percival.
+
+## Setting Up Development Environment
+
+The following tools need to be installed in order to build and run the project:
+
+-  [Java 17 JDK (Java Development Kit)](https://adoptium.net)
+-  [Apache Maven 3.8.5](https://maven.apache.org/download.cgi)
+-  [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/)
+   - Required by the functional (Selenium) test suite
+
+Ensure `java`, `javac`, and `mvn` commands can be invoked from inside the shell:
+
+```shell
+$ java --version
+openjdk 17.0.3 2022-04-19
+OpenJDK Runtime Environment Temurin-17.0.3+7 (build 17.0.3+7)
+OpenJDK 64-Bit Server VM Temurin-17.0.3+7 (build 17.0.3+7, mixed mode, sharing)
+$ javac --version
+javac 17.0.3
+$ mvn --version
+Apache Maven 3.8.2 (ea98e05a04480131370aa0c110b8c54cf726c06f)
+```
+
+We recommend [IntelliJ IDEA](https://www.jetbrains.com/idea/) Community Edition
+as the IDE for developing the project. Other IDE or text editor such as Eclipse
+and Visual Studio Code might work, but we may not be able to help troubleshoot
+any IDE-related issues. In addition, we include IntelliJ-specific **run configurations**
+in the codebase that will add shortcuts for running the test suites and coverage
+reporting from within IntelliJ.
 
 ## Getting Started
-
-This project uses Java 17 and Spring Boot framework. The test suite comprises
-unit and functional test suites. The functional tests are run using Selenium on
-Firefox browser.
 
 To run the whole test suite, execute:
 
