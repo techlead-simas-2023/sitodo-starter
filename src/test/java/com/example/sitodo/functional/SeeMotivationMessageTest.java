@@ -1,31 +1,24 @@
 package com.example.sitodo.functional;
 
-import io.github.bonigarcia.seljup.SeleniumJupiter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.$;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ExtendWith({SpringExtension.class, SeleniumJupiter.class})
-@SpringBootTest(webEnvironment = RANDOM_PORT)
 @DisplayName("User Story 3: See Motivation Message")
 @Tag("e2e")
 class SeeMotivationMessageTest extends BaseFunctionalTest {
@@ -61,35 +54,35 @@ class SeeMotivationMessageTest extends BaseFunctionalTest {
 
     @Test
     @DisplayName("A user can see a motivation message when the list is empty")
-    void emptyTodoList_showMessage() throws Exception {
-        driver.get(createBaseUrl("localhost", serverPort));
+    void emptyTodoList_showMessage() {
+        open("/");
 
-        WebElement motivationMessage = driver.findElement(By.id("motivation_message"));
+        WebElement motivationMessage = $(By.id("motivation_message"));
 
         assertThat(motivationMessage.getText(), containsString(emptyListMessage));
     }
 
     @Test
     @DisplayName("A user can see a motivation message when there is only one item in the list")
-    void todoList_singleItem() throws Exception {
-        driver.get(createBaseUrl("localhost", serverPort));
+    void todoList_singleItem() {
+        open("/");
 
         // Add one item
         postNewTodoItem("Buy milk");
 
         // See the motivation message when there is no finished item
-        WebElement motivationMessage = driver.findElement(By.id("motivation_message"));
+        WebElement motivationMessage = $(By.id("motivation_message"));
         assertThat(motivationMessage.getText(), allOf(
             containsString(fewItemsMessage),
             containsString(noFinishedMessage)
         ));
 
         // Finish that one item
-        WebElement markFinishLink = driver.findElement(By.className("sitodo-finish-link"));
+        WebElement markFinishLink = $(By.className("sitodo-finish-link"));
         markFinishLink.click();
 
         // The message should be different
-        motivationMessage = driver.findElement(By.id("motivation_message"));
+        motivationMessage = $(By.id("motivation_message"));
         assertThat(motivationMessage.getText(), allOf(
             containsString(fewItemsMessage),
             containsString(allFinishedMessage)
@@ -98,8 +91,8 @@ class SeeMotivationMessageTest extends BaseFunctionalTest {
 
     @Test
     @DisplayName("A user can see a motivation message when half of the items are finished")
-    void todoList_multipleItems_halfFinished() throws Exception {
-        driver.get(createBaseUrl("localhost", serverPort));
+    void todoList_multipleItems_halfFinished() {
+        open("/");
 
         // Create 10 items
         List<String> items = IntStream.range(0, manyItemsThreshold)
@@ -119,16 +112,16 @@ class SeeMotivationMessageTest extends BaseFunctionalTest {
         });
 
         // Check initial motivation message
-        WebElement motivationMessage = driver.findElement(By.id("motivation_message"));
+        WebElement motivationMessage = $(By.id("motivation_message"));
         assertThat(motivationMessage.getText(), allOf(
             containsString(manyItemsMessage),
             containsString(noFinishedMessage)
         ));
 
-        // Mark half of the items as finished
+        // Mark half of the items as finished sequentially
+        // TODO: Refactor to use Selenide
         IntStream.range(0, items.size() / 2).forEach(i ->
-            new WebDriverWait(driver, DEFAULT_WAIT)
-                .until(ExpectedConditions.visibilityOfNestedElementsLocatedBy(By.tagName("tbody"), By.tagName("tr")))
+            $(By.tagName("tbody")).findAll(By.tagName("tr"))
                 .stream()
                 .filter(row -> {
                     List<WebElement> columns = row.findElements(By.tagName("td"));
@@ -149,7 +142,7 @@ class SeeMotivationMessageTest extends BaseFunctionalTest {
         );
 
         // Check final motivation message
-        motivationMessage = driver.findElement(By.id("motivation_message"));
+        motivationMessage = $(By.id("motivation_message"));
         assertThat(motivationMessage.getText(), allOf(
             containsString(manyItemsMessage),
             containsString(halfFinishedMessage)

@@ -1,36 +1,35 @@
 package com.example.sitodo.functional;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+import com.codeborne.selenide.CollectionCondition;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.codeborne.selenide.Configuration.baseUrl;
+import static com.codeborne.selenide.Configuration.browser;
+import static com.codeborne.selenide.Configuration.headless;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.closeWebDriver;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 public abstract class BaseFunctionalTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseFunctionalTest.class);
 
-    protected static final Duration DEFAULT_WAIT = Duration.ofSeconds(5);
     protected static final int DEFAULT_NUMBER_OF_COLUMNS = 4;
-
-    protected WebDriver driver;
 
     @LocalServerPort
     protected int serverPort;
@@ -44,27 +43,18 @@ public abstract class BaseFunctionalTest {
 
     @BeforeEach
     void setUp() {
-        LOG.info("Initializing Web browser");
-        driver = initFirefoxDriver(isCI);
+        browser = "firefox";
+        baseUrl = String.format("%s:%d", "http://localhost", serverPort);
+        headless = isCI;
     }
 
     @AfterEach
     void tearDown() {
-        LOG.info("Terminating the Web browser");
-        driver.quit();
-    }
-
-    protected String createBaseUrl(String protocol, String host, int port) {
-        return String.format("%s://%s:%d", protocol, host, port);
-    }
-
-    protected String createBaseUrl(String host, int port) {
-        return createBaseUrl("http", host, port);
+        closeWebDriver();
     }
 
     protected void postNewTodoItem(String item) {
-        WebElement inputField = new WebDriverWait(driver, DEFAULT_WAIT)
-            .until(ExpectedConditions.elementToBeClickable(By.tagName("input")));
+        WebElement inputField = $(By.tagName("input"));
 
         inputField.sendKeys(item, Keys.ENTER);
 
@@ -86,18 +76,12 @@ public abstract class BaseFunctionalTest {
             LOG.error("There was a problem during artificial delay", exception);
         }
 
-        List<WebElement> rows = new WebDriverWait(driver, DEFAULT_WAIT)
-            .until(ExpectedConditions.presenceOfNestedElementsLocatedBy(
-                By.tagName("tbody"),
-                By.tagName("tr"))
-            );
-
-        assertEquals(expectedItems.size(), rows.size(), "There were " + rows.size() + " items in the list");
-
-        rows.forEach(row -> isRowValid(expectedItems, row));
+        $(By.tagName("tbody")).findAll(By.tagName("tr"))
+            .shouldHave(CollectionCondition.size(expectedItems.size()))
+            .should(CollectionCondition.allMatch("Valid row", (row) -> isRowValid(expectedItems, row)));
     }
 
-    private void isRowValid(List<String> expectedItems, WebElement row) {
+    private boolean isRowValid(List<String> expectedItems, WebElement row) {
         List<WebElement> columns = row.findElements(By.tagName("td"));
 
         assertEquals(DEFAULT_NUMBER_OF_COLUMNS, columns.size(),
@@ -106,17 +90,6 @@ public abstract class BaseFunctionalTest {
         String id = columns.get(0).getText();
         String title = columns.get(1).getText();
 
-        assertTrue(Pattern.matches("\\d+", id), "ID must be an integer");
-        assertTrue(expectedItems.contains(title), title + " was not found in the list");
-    }
-
-    private static WebDriver initFirefoxDriver(boolean isCI) {
-        WebDriverManager.firefoxdriver().setup();
-
-        LOG.info("Is Firefox running on CI? {}", isCI);
-        FirefoxOptions options = new FirefoxOptions()
-            .setHeadless(isCI);
-
-        return new FirefoxDriver(options);
+        return Pattern.matches("\\d+", id) && expectedItems.contains(title);
     }
 }
