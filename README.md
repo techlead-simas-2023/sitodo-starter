@@ -78,4 +78,5 @@ See the running example based on the main branch at [Heroku](https://sitodo-exam
 
 ## License
 
-This project is licensed under the terms of the [MIT license](./LICENSE).
+This project is licensed under the terms of the [MIT license](./LICENSE). The
+included [static site](./docs) is licensed under [Creative Commons Attribution 4.0](./docs/LICENSE).
