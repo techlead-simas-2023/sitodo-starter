@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.1</version>
+		<version>2.7.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>sitodo</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>sitodo</name>
 	<description>A basic todo app for teaching basic Web programming, Git workflows, and CI/CD. Heavily inspired by the
 		running example in &quot;Test-Driven Development with Python&quot; book by Harry Percival.
@@ -40,8 +40,13 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -72,6 +77,7 @@
 		</dependency>
 	</dependencies>
 
+	<!-- TODO Add Liquibase migration tasks (create, rollback) in pom.xml -->
 	<build>
 		<plugins>
 			<plugin>

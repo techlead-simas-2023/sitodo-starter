@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public abstract class BaseFunctionalTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseFunctionalTest.class);
@@ -41,16 +43,21 @@ public abstract class BaseFunctionalTest {
     @Value("${ci:false}")
     private boolean isCI;
 
+    @Value("${sitodo.baseUrl:http://localhost}")
+    private String testBaseUrl;
+
     @BeforeEach
     void setUp() {
         browser = "firefox";
-        baseUrl = String.format("%s:%d", "http://localhost", serverPort);
+        baseUrl = String.format("%s:%d", testBaseUrl, serverPort);
         headless = isCI;
     }
 
     @AfterEach
     void tearDown() {
         closeWebDriver();
+        // TODO Figure out how to rollback the database at the end of each
+        //      functional test case
     }
 
     protected void postNewTodoItem(String item) {

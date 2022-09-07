@@ -27,9 +27,13 @@ import static org.mockito.Mockito.when;
 class TodoListServiceTest {
 
     // Challenge: We can make this unit test suite to be fully independent, i.e.
-    // run without integration with Spring Boot framework. How?
+    // run without integration with the Spring Boot framework. How?
     // Hint to the challenge: Erasing @SpringBootTest & @MockBean annotations
     //                        are not enough!
+    //
+    // Since the current version requires @SpringBootTest annotation, the tests
+    // need a PostgreSQl instance running during test execution, albeit there
+    // will not be any new rows inserted into the database.
     //
     // If you happen to come up with a solution to the challenge, then try to
     // reflect with the discussion on software design and testing. Several
