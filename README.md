@@ -30,8 +30,8 @@ Apache Maven 3.8.2 (ea98e05a04480131370aa0c110b8c54cf726c06f)
 ```
 
 We recommend [IntelliJ IDEA](https://www.jetbrains.com/idea/) Community Edition
-as the IDE for developing the project. Other IDE or text editor such as Eclipse
-and Visual Studio Code might work, but we may not be able to help troubleshoot
+as the IDE for developing the project. Other IDE or text editors, such as Eclipse
+and Visual Studio Code, might work. However, we may not be able to help troubleshoot
 any IDE-related issues. In addition, we include IntelliJ-specific **run configurations**
 in the codebase that will add shortcuts for running the test suites and coverage
 reporting from within IntelliJ.
@@ -57,8 +57,8 @@ mvn package -DskipTests
 
 > The `-DskipTests` option lets `package` task to build the app into executable
 > JAR file without running all test suites. If the option was omitted, then
-> all test suites will run, thus increasing the duration of build process,
-> especially the functional test suite that run much longer than the unit test
+> all test suites will run, thus increasing the duration of the building process,
+> especially the functional test suite that runs much longer than the unit test
 > suite.
 
 The JAR file will be generated at [`./target`](./target) directory. To run it,
@@ -79,4 +79,4 @@ See the running example based on the main branch at [Heroku](https://sitodo-exam
 ## License
 
 This project is licensed under the terms of the [MIT license](./LICENSE). The
-included [static site](./docs) is licensed under [Creative Commons Attribution 4.0](./docs/LICENSE).
+included [static site](./docs) is licensed under [Creative Commons Attribution-ShareAlike 4.0](./docs/LICENSE).

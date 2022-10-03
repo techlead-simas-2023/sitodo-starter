@@ -198,3 +198,10 @@ replay_pid*
 
 # Custom ignore list
 .venv/
+
+# Static site
+site/
+
+# H2 database file
+sitodo.db*
+sitodo.*.db
