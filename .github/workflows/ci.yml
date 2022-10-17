@@ -42,6 +42,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
@@ -65,3 +67,13 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: 9BZ4S4Jt
         run: |
           mvn $MAVEN_CLI_OPTS test -Dgroups=e2e -Djacoco.destFile=target/jacoco-functional.exec
+      - name: Merge code coverage reports
+        run: |
+          mvn verify -DskipTests
+      - name: Run SonarScanner
+        run: |
+          mvn -B verify -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
