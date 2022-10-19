@@ -3,8 +3,7 @@ package com.example.sitodo.controller;
 import com.example.sitodo.model.TodoItem;
 import com.example.sitodo.model.TodoList;
 import com.example.sitodo.service.TodoListService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,9 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
 @Controller
+@Slf4j
 public class TodoListController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TodoListController.class);
 
     private TodoListService todoListService;
 
@@ -35,6 +33,7 @@ public class TodoListController {
     @GetMapping("/list/{id}")
     public String showList(@PathVariable("id") Long id, Model model) {
         TodoList foundTodoList = todoListService.getTodoListById(id);
+        log.debug("Show list with ID {}", foundTodoList.getId());
 
         model.addAttribute("todoList", foundTodoList);
         model.addAttribute("motivationMessage", todoListService.computeMotivationMessage(foundTodoList));
@@ -44,11 +43,8 @@ public class TodoListController {
 
     @PostMapping("/list")
     public String newItem(@RequestParam("item_text") String item) {
-        LOG.debug("New item: {}", item);
-
         TodoList saved = todoListService.addTodoItem(new TodoItem(item));
-
-        LOG.debug("New item ID: {}", saved.getId());
+        log.debug("Saved a new item into a new list with ID {}", saved.getId());
 
         return redirectToList(saved.getId());
     }
@@ -56,11 +52,8 @@ public class TodoListController {
     @PostMapping("/list/{id}")
     public String newItem(@PathVariable("id") Long id,
                           @RequestParam("item_text") String item) {
-        LOG.debug("New item: {}", item);
-
         TodoList saved = todoListService.addTodoItem(id, new TodoItem(item));
-
-        LOG.debug("New item ID: {}", saved.getId());
+        log.debug("Saved a new item into a list with ID {}", saved.getId());
 
         return redirectToList(saved.getId());
     }
@@ -70,6 +63,7 @@ public class TodoListController {
                              @PathVariable("item_id") Long itemId,
                              @RequestParam("finished") Boolean finished) {
         TodoList updated = todoListService.updateTodoItem(listId, itemId, finished);
+        log.debug("Updated an item in a list with ID {}", updated.getId());
 
         return redirectToList(updated.getId());
     }

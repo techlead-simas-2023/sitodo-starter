@@ -3,6 +3,7 @@ package com.example.sitodo.service;
 import com.example.sitodo.model.TodoItem;
 import com.example.sitodo.model.TodoList;
 import com.example.sitodo.repository.TodoListRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class TodoListService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TodoListService.class);
     private static final String TODO_LIST_DOES_NOT_EXIST_FMT = "TodoList(id=%d) does not exist";
 
     private TodoListRepository todoListRepository;
@@ -109,7 +110,7 @@ public class TodoListService {
         final long totalFinishedItems = (items != null) ?
             items.stream().filter(TodoItem::getFinished).count() : 0;
 
-        LOG.debug("Total Items: {}; Total Finished Items: {}", totalItems, totalFinishedItems);
+        log.debug("Total Items: {}; Total Finished Items: {}", totalItems, totalFinishedItems);
 
         String output = "";
 
@@ -141,7 +142,7 @@ public class TodoListService {
             }
         }
 
-        LOG.debug("Resulting output: {}", output);
+        log.debug("Resulting output: {}", output);
 
         return output;
     }
