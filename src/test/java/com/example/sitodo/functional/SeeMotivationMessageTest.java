@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @DisplayName("User Story 3: See Motivation Message")
 @Tag("e2e")
@@ -51,16 +51,6 @@ class SeeMotivationMessageTest extends BaseFunctionalTest {
 
     @Value("${sitodo.motivation.manyItemsThreshold:10}")
     private int manyItemsThreshold;
-
-    @Test
-    @DisplayName("A user can see a motivation message when the list is empty")
-    void emptyTodoList_showMessage() {
-        open("/");
-
-        WebElement motivationMessage = $(By.id("motivation_message"));
-
-        assertThat(motivationMessage.getText(), containsString(emptyListMessage));
-    }
 
     @Test
     @DisplayName("A user can see a motivation message when there is only one item in the list")
@@ -111,7 +101,7 @@ class SeeMotivationMessageTest extends BaseFunctionalTest {
             }
         });
 
-        // Check initial motivation message
+        // Check the initial motivation message
         WebElement motivationMessage = $(By.id("motivation_message"));
         assertThat(motivationMessage.getText(), allOf(
             containsString(manyItemsMessage),

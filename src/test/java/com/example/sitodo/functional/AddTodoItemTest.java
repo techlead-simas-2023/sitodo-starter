@@ -1,18 +1,20 @@
 package com.example.sitodo.functional;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
-import static com.codeborne.selenide.Selenide.webdriver;
+import static com.codeborne.selenide.Selenide.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("User Story 1: Add Todo Item")
 @Tag("e2e")
+@Transactional
 class AddTodoItemTest extends BaseFunctionalTest {
 
     @Test

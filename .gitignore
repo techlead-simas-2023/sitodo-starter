@@ -205,3 +205,8 @@ site/
 # H2 database file
 sitodo.db*
 sitodo.*.db
+
+# IntelliJ Plugins
+.idea/checkstyle-idea.xml
+.idea/sonarlint.xml
+.idea/sonarlint-state.xml

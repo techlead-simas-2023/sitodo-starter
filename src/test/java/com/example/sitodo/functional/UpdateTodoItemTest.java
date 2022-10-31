@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("User Story 2: Update Todo Item")
 @Tag("e2e")
+@Transactional
 class UpdateTodoItemTest extends BaseFunctionalTest {
 
     @Test

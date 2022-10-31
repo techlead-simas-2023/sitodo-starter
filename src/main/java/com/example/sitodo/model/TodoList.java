@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,10 +17,10 @@ public class TodoList {
     private Long id;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<TodoItem> items;
+    private List<TodoItem> items = new ArrayList<>();
 
     public TodoList(List<TodoItem> items) {
-        this.items= items;
+        this.items = items;
     }
 
     public void addTodoItem(TodoItem item) {

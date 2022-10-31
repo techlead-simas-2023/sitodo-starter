@@ -1,8 +1,12 @@
-package com.example.sitodo.service;
+package com.example.sitodo.service.impl;
 
+import com.example.sitodo.dto.TodoListDto;
+import com.example.sitodo.form.TodoItemForm;
 import com.example.sitodo.model.TodoItem;
 import com.example.sitodo.model.TodoList;
 import com.example.sitodo.repository.TodoListRepository;
+import com.example.sitodo.service.MotivationMessageService;
+import com.example.sitodo.service.TodoListService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -15,16 +19,16 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Tag("unit")
 @SpringBootTest
-class TodoListServiceTest {
+class TodoListServiceImplTest {
 
     // Challenge: We can make this unit test suite to be fully independent, i.e.
     // run without integration with the Spring Boot framework. How?
@@ -49,6 +53,9 @@ class TodoListServiceTest {
 
     @Autowired
     private TodoListService todoListService;
+
+    @Autowired
+    private MotivationMessageService motivationMessageService;
 
     @Value("${sitodo.motivation.empty}")
     private String emptyListMessage;
@@ -80,12 +87,12 @@ class TodoListServiceTest {
     @Test
     @DisplayName("Given an existing ID, getTodoListById should return an existing list")
     void getTodoListById_ok() {
-        TodoList todoList = createTodoList("Buy milk");
+        TodoList todoList = createTodoListEntity("Buy milk");
         when(todoListRepository.findById(anyLong())).thenReturn(Optional.of(todoList));
 
-        TodoList savedList = todoListService.getTodoListById(1L);
+        TodoListDto savedList = todoListService.getTodoListById(1L);
 
-        assertFalse(savedList.getItems().isEmpty());
+        assertFalse(savedList.items().isEmpty());
     }
 
     @Test
@@ -99,62 +106,65 @@ class TodoListServiceTest {
     @Test
     @DisplayName("Given a new todo item, addTodoItem should save the item into a new list")
     void addTodoItem_ok() {
-        TodoItem todoItem = new TodoItem("Buy milk");
-        when(todoListRepository.save(any(TodoList.class))).thenReturn(new TodoList(List.of(todoItem)));
+        TodoItem fakeTodoItem = new TodoItem(1L, "Buy milk");
+        TodoList fakeTodoList = new TodoList();
+        fakeTodoList.setId(1L);
+        fakeTodoList.setItems(List.of(fakeTodoItem));
+        when(todoListRepository.save(any(TodoList.class)))
+            .thenReturn(fakeTodoList);
 
-        TodoList savedList = todoListService.addTodoItem(todoItem);
-        TodoItem savedTodoItem = savedList.getItems().get(0);
+        TodoListDto newTodoList = todoListService.addTodoItem(createTodoItemForm("Buy milk"));
 
-        assertFalse(savedList.getItems().isEmpty());
-        assertEquals("Buy milk", savedTodoItem.getTitle());
+        assertFalse(newTodoList.items().isEmpty());
     }
 
     @Test
     @DisplayName("Given a todo item, addTodoItem should save the item into an existing list")
     void addTodoItem_existingList_ok() {
-        TodoList list = createTodoList("Buy milk");
-        when(todoListRepository.findById(anyLong())).thenReturn(Optional.of(list));
+        TodoItem fakeTodoItem = new TodoItem(1L, "Buy milk");
+        TodoList fakeTodoList = new TodoList();
+        fakeTodoList.setId(1L);
+        fakeTodoList.addTodoItem(fakeTodoItem);
+        when(todoListRepository.findById(anyLong()))
+            .thenReturn(Optional.of(fakeTodoList));
+        when(todoListRepository.save(fakeTodoList))
+            .thenReturn(fakeTodoList);
 
-        todoListService.addTodoItem(1L, new TodoItem("Touch grass"));
+        TodoListDto updatedTodoList = todoListService.addTodoItem(1L, createTodoItemForm("Touch grass"));
 
-        assertEquals(2, list.getItems().size(), "The numbers of items in the list: " + list.getItems().size());
+        assertEquals(2L, updatedTodoList.countTotal());
     }
 
     @Test
     @DisplayName("Suppose the list does not exist, addTodoItem should throw an exception")
     void addTodoItem_existingList_exception() {
-        when(todoListRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> todoListService.addTodoItem(1L, new TodoItem("Buy milk")));
+        assertThrows(NoSuchElementException.class, () -> todoListService.addTodoItem(1L, createTodoItemForm("Buy milk")));
     }
 
     @Test
-    @DisplayName("Given an existing list with an item, updateTodoItem should update the status of an item")
+    @DisplayName("Given an existing list with an item, setTodoItemFinished should update the status of an item")
     void updateTodoItem_ok() {
-        TodoItem item = new TodoItem(1L, "Buy milk");
-        TodoList list = mock(TodoList.class);
-        when(todoListRepository.findById(anyLong())).thenReturn(Optional.of(list));
-        when(list.getItems()).thenReturn(List.of(item));
+        TodoList fakeTodoList = new TodoList();
+        fakeTodoList.setId(1L);
+        fakeTodoList.addTodoItem(new TodoItem(1L, "Buy milk"));
+        when(todoListRepository.findById(anyLong())).thenReturn(Optional.of(fakeTodoList));
+        when(todoListRepository.save(fakeTodoList)).thenReturn(fakeTodoList);
 
-        todoListService.updateTodoItem(1L, 1L, true);
+        TodoListDto updatedTodoList = todoListService.setTodoItemFinished(1L, 1L, true);
 
-        assertTrue(list.getItems().stream().anyMatch(TodoItem::getFinished));
+        assertEquals(1, updatedTodoList.countFinishedItems());
     }
 
     @Test
-    @DisplayName("Suppose the list does not exist, updateTodoItem should throw an exception")
+    @DisplayName("Suppose the list does not exist, setTodoItemFinished should throw an exception")
     void updateTodoItem_exception() {
-        when(todoListRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> todoListService.updateTodoItem(1L, 2L, true));
+        assertThrows(NoSuchElementException.class, () -> todoListService.setTodoItemFinished(1L, 2L, true));
     }
 
     @Test
     @DisplayName("Given an empty list, computeMotivationMessage should produce the correct message")
     void computeMotivationMessage_emptyList() {
-        TodoList emptyList = new TodoList(Collections.emptyList());
-
-        String message = todoListService.computeMotivationMessage(emptyList);
+        String message = motivationMessageService.computeMotivationMessage(0, 0);
 
         assertThat(message, containsString(emptyListMessage));
     }
@@ -162,9 +172,7 @@ class TodoListServiceTest {
     @Test
     @DisplayName("Given a list with few items all unfinished, computeMotivationMessage should produce the correct message")
     void computeMotivationMessage_fewItems_noFinished() {
-        TodoList list = createTodoList("Get outside", "Touch grass", "Breathe air", "Buy milk");
-
-        String message = todoListService.computeMotivationMessage(list);
+        String message = motivationMessageService.computeMotivationMessage(4, 0);
 
         assertThat(message, allOf(
             containsString(fewItemsMessage),
@@ -175,10 +183,7 @@ class TodoListServiceTest {
     @Test
     @DisplayName("Given a list with few items all finished, computeMotivationMessage should produce the correct message")
     void computeMotivationMessage_fewItems_allFinished() {
-        TodoList list = createTodoList("Get outside", "Touch grass", "Breathe air", "Buy milk");
-        list.getItems().forEach(item -> item.setFinished(true));
-
-        String message = todoListService.computeMotivationMessage(list);
+        String message = motivationMessageService.computeMotivationMessage(4, 4);
 
         assertThat(message, allOf(
             containsString(fewItemsMessage),
@@ -189,15 +194,7 @@ class TodoListServiceTest {
     @Test
     @DisplayName("Given a list with few items half finished, computeMotivationMessage should produce the correct message")
     void computeMotivationMessage_fewItems_halfFinished() {
-        TodoList list = createTodoList("Get outside", "Touch grass", "Breathe air", "Buy milk");
-        int itemCount = list.getItems().size();
-
-        for (int i = 0; i < itemCount / 2; i++) {
-            TodoItem item = list.getItems().get(i);
-            item.setFinished(true);
-        }
-
-        String message = todoListService.computeMotivationMessage(list);
+        String message = motivationMessageService.computeMotivationMessage(4, 2);
 
         assertThat(message, allOf(
             containsString(fewItemsMessage),
@@ -208,10 +205,7 @@ class TodoListServiceTest {
     @Test
     @DisplayName("Given a list with few items and single item finished, computeMotivationMessage should produce the correct message")
     void computeMotivationMessage_fewItems_singleFinished() {
-        TodoList list = createTodoList("Get outside", "Touch grass", "Breathe air", "Buy milk");
-        list.getItems().get(0).setFinished(true);
-
-        String message = todoListService.computeMotivationMessage(list);
+        String message = motivationMessageService.computeMotivationMessage(4, 1);
 
         assertThat(message, allOf(
             containsString(fewItemsMessage),
@@ -226,9 +220,8 @@ class TodoListServiceTest {
             .range(0, manyItemsThreshold)
             .mapToObj(i -> "Task " + i)
             .toArray(String[]::new);
-        TodoList list = createTodoList(items);
 
-        String message = todoListService.computeMotivationMessage(list);
+        String message = motivationMessageService.computeMotivationMessage(items.length, 0);
 
         assertThat(message, allOf(
             containsString(manyItemsMessage),
@@ -243,10 +236,8 @@ class TodoListServiceTest {
             .range(0, manyItemsThreshold)
             .mapToObj(i -> "Task " + i)
             .toArray(String[]::new);
-        TodoList list = createTodoList(items);
-        list.getItems().forEach(todoItem -> todoItem.setFinished(true));
 
-        String message = todoListService.computeMotivationMessage(list);
+        String message = motivationMessageService.computeMotivationMessage(items.length, items.length);
 
         assertThat(message, allOf(
             containsString(manyItemsMessage),
@@ -261,15 +252,8 @@ class TodoListServiceTest {
             .range(0, manyItemsThreshold * 2)
             .mapToObj(i -> "Task " + i)
             .toArray(String[]::new);
-        TodoList list = createTodoList(items);
-        int countItems = list.getItems().size();
 
-        for (int i = 0; i < countItems / 2; i++) {
-            TodoItem item = list.getItems().get(i);
-            item.setFinished(true);
-        }
-
-        String message = todoListService.computeMotivationMessage(list);
+        String message = motivationMessageService.computeMotivationMessage(items.length, items.length / 2);
 
         assertThat(message, allOf(
             containsString(manyItemsMessage),
@@ -284,10 +268,8 @@ class TodoListServiceTest {
             .range(0, manyItemsThreshold * 2)
             .mapToObj(i -> "Task " + i)
             .toArray(String[]::new);
-        TodoList list = createTodoList(items);
-        list.getItems().get(0).setFinished(true);
 
-        String message = todoListService.computeMotivationMessage(list);
+        String message = motivationMessageService.computeMotivationMessage(items.length, 1);
 
         assertThat(message, allOf(
             containsString(manyItemsMessage),
@@ -295,7 +277,7 @@ class TodoListServiceTest {
         ));
     }
 
-    private TodoList createTodoList(String... items) {
+    private TodoList createTodoListEntity(String... items) {
         TodoList list = new TodoList(new ArrayList<>());
 
         Arrays.stream(items)
@@ -303,5 +285,12 @@ class TodoListServiceTest {
             .forEach(list::addTodoItem);
 
         return list;
+    }
+
+    private static TodoItemForm createTodoItemForm(String title) {
+        TodoItemForm newTodoItem = new TodoItemForm();
+        newTodoItem.setTitle(title);
+
+        return newTodoItem;
     }
 }

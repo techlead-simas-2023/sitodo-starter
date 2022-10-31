@@ -1,7 +1,10 @@
 package com.example.sitodo.controller;
 
+import com.example.sitodo.dto.TodoItemDto;
+import com.example.sitodo.dto.TodoListDto;
 import com.example.sitodo.model.TodoItem;
 import com.example.sitodo.model.TodoList;
+import com.example.sitodo.service.MotivationMessageService;
 import com.example.sitodo.service.TodoListService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -15,8 +18,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,6 +35,9 @@ class TodoListControllerTest {
 
     @MockBean
     private TodoListService todoListService;
+
+    @MockBean
+    private MotivationMessageService motivationMessageService;
 
     @Test
     @DisplayName("HTTP GET '/list' retrieves list view")
@@ -59,11 +64,7 @@ class TodoListControllerTest {
     @Test
     @DisplayName("HTTP GET '/list/{id}' returns an HTML page with non-empty list")
     void showList_byId_returnsHtml() throws Exception {
-        TodoItem mockTodoItem = createMockTodoItem(1L, "Buy milk");
-        TodoList mockList = mock(TodoList.class);
-        when(mockList.getId()).thenReturn(1L);
-        when(mockList.getItems()).thenReturn(List.of(mockTodoItem));
-        when(todoListService.getTodoListById(anyLong())).thenReturn(mockList);
+        when(todoListService.getTodoListById(1L)).thenReturn(new TodoListDto(1L, List.of(new TodoItemDto(1L, "Buy milk", false))));
 
         mockMvc.perform(get("/list/1")).andExpectAll(
             status().isOk(),
@@ -89,18 +90,16 @@ class TodoListControllerTest {
     @Test
     @DisplayName("HTTP GET '/list/{id}/update/{item_id}' successfully updated status of an item")
     void updateItem_ok() throws Exception {
-        TodoItem mockTodoItem = createMockTodoItem(1L, "Buy milk");
-        TodoList mockList = createMockTodoList(1L, mockTodoItem);
-        mockTodoItem.setFinished(true);
+        TodoListDto todoListSingleItem = new TodoListDto(1L, List.of(new TodoItemDto(1L, "Buy milk", true)));
 
-        when(todoListService.updateTodoItem(anyLong(), anyLong(), anyBoolean())).thenReturn(mockList);
+        when(todoListService.setTodoItemFinished(1L, 1L, true))
+            .thenReturn(todoListSingleItem);
+        when(todoListService.getTodoListById(1L)).thenReturn(todoListSingleItem);
 
         mockMvc.perform(get("/list/1/update/1?finished=true")).andExpectAll(
             status().is3xxRedirection(),
             redirectedUrl("/list/1")
         );
-
-        when(todoListService.getTodoListById(anyLong())).thenReturn(mockList);
 
         mockMvc.perform(get("/list/1")).andExpectAll(
             status().isOk(),
@@ -122,7 +121,7 @@ class TodoListControllerTest {
         // The view layer then use the mock object as data model for rendering the HTML.
     }
 
-    private TodoList createMockTodoList(Long id, TodoItem ... items) {
+    private TodoList createMockTodoList(Long id, TodoItem... items) {
         TodoList mockTodoList = mock(TodoList.class);
 
         when(mockTodoList.getId()).thenReturn(id);

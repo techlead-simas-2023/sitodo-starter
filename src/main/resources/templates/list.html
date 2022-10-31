@@ -1,21 +1,10 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
-    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.1/dist/css/bootstrap.css}"/>
-
-    <title>Sitodo</title>
+<head th:replace="fragments/base.html :: head(pageTitle='SITODO List')">
 </head>
 <body>
 <div class="container">
-    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-        <a th:href="@{${todoList.id != null} ? '/list/' + ${todoList.id} : '/list'}"
-           class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-            <img class="bi me-2" src="/images/logo_placeholder.png" width="160" height="40" alt="logo"/>
-            <span class="fs-4">SITODO</span>
-        </a>
+    <header th:replace="fragments/base.html :: header">
     </header>
     <table id="id_list_table" class="table caption-top">
         <caption class="display-1">Your Todo List</caption>
@@ -27,8 +16,8 @@
             <th scope="col">Actions</th>
         </tr>
         </thead>
-        <tbody>
-        <tr th:if="${todoList.id != null}" th:each="item : ${todoList.items}">
+        <tbody th:if="${todoList}">
+        <tr th:object="${todoList}" th:each="item : ${todoList.items}">
             <td th:text="${item.id}">1</td>
             <td th:text="${item.title}">Cook rice</td>
             <td th:text="${item.finished} ? 'Finished' : 'Not Finished'">Not Finished</td>
@@ -44,7 +33,14 @@
             </td>
         </tr>
         </tbody>
-        <tfoot>
+        <tbody th:unless="${todoList}">
+        <tr>
+            <td colspan="4">
+                <p>Your list is currently empty.</p>
+            </td>
+        </tr>
+        </tbody>
+        <tfoot th:if="${todoList}">
         <tr>
             <td colspan="4">
                 <p id="motivation_message" th:text="${motivationMessage}">A motivation message</p>
@@ -52,11 +48,9 @@
         </tr>
         </tfoot>
     </table>
-    <form th:action="@{${todoList.id != null} ? '/list/' + ${todoList.id} : '/list'}" method="post">
-        <input type="text" id="id_new_item" name="item_text" placeholder="Enter an item"/>
-        <button type="submit" class="btn btn-primary btn-sm">Enter</button>
+    <form th:replace="fragments/list.html :: entry">
     </form>
 </div>
-<script th:src="@{/webjars/bootstrap/5.2.1/dist/js/bootstrap.bundle.js}"></script>
+<script th:replace="fragments/base.html :: script.bootstrap-js"></script>
 </body>
 </html>

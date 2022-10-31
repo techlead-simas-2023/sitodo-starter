@@ -1,14 +1,17 @@
 package com.example.sitodo.controller;
 
-import com.example.sitodo.model.TodoItem;
-import com.example.sitodo.model.TodoList;
+import com.example.sitodo.dto.TodoListDto;
+import com.example.sitodo.form.TodoItemForm;
+import com.example.sitodo.service.MotivationMessageService;
 import com.example.sitodo.service.TodoListService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.NoSuchElementException;
 
 @Controller
@@ -17,55 +20,80 @@ public class TodoListController {
 
     private TodoListService todoListService;
 
+    private MotivationMessageService motivationMessageService;
+
     @Autowired
     public void setTodoListService(TodoListService todoListService) {
         this.todoListService = todoListService;
     }
 
+    @Autowired
+    public void setMotivationMessageService(MotivationMessageService motivationMessageService) {
+        this.motivationMessageService = motivationMessageService;
+    }
+
     @GetMapping("/list")
-    public String showList(TodoList todoList, Model model) {
-        model.addAttribute("todoList", todoList);
-        model.addAttribute("motivationMessage", todoListService.computeMotivationMessage(todoList));
+    public String showList(Model model) {
+        model.addAttribute("todoItemForm", new TodoItemForm());
+        model.addAttribute("motivationMessage", motivationMessageService.computeMotivationMessage(0, 0));
 
         return "list";
     }
 
     @GetMapping("/list/{id}")
     public String showList(@PathVariable("id") Long id, Model model) {
-        TodoList foundTodoList = todoListService.getTodoListById(id);
-        log.debug("Show list with ID {}", foundTodoList.getId());
+        TodoListDto foundTodoList = todoListService.getTodoListById(id);
+        log.debug("Show list with ID {}", foundTodoList.id());
 
         model.addAttribute("todoList", foundTodoList);
-        model.addAttribute("motivationMessage", todoListService.computeMotivationMessage(foundTodoList));
+        model.addAttribute("todoItemForm", new TodoItemForm());
+        model.addAttribute("motivationMessage", motivationMessageService.computeMotivationMessage(foundTodoList.countTotal(), foundTodoList.countFinishedItems()));
 
         return "list";
     }
 
     @PostMapping("/list")
-    public String newItem(@RequestParam("item_text") String item) {
-        TodoList saved = todoListService.addTodoItem(new TodoItem(item));
-        log.debug("Saved a new item into a new list with ID {}", saved.getId());
+    public String newItem(@Valid TodoItemForm todoItemForm, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(error -> log.warn(error.toString()));
+            return "list";
+        }
 
-        return redirectToList(saved.getId());
+        TodoListDto saved = todoListService.addTodoItem(todoItemForm);
+        log.debug("Saved a new item into a new list (ID: {})", saved.id());
+
+        return redirectToList(saved.id());
     }
 
     @PostMapping("/list/{id}")
-    public String newItem(@PathVariable("id") Long id,
-                          @RequestParam("item_text") String item) {
-        TodoList saved = todoListService.addTodoItem(id, new TodoItem(item));
-        log.debug("Saved a new item into a list with ID {}", saved.getId());
+    public String newItem(@PathVariable("id") Long id, @Valid TodoItemForm todoItemForm,
+                          BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(error -> log.warn(error.toString()));
 
-        return redirectToList(saved.getId());
+            TodoListDto foundTodoList = todoListService.getTodoListById(id);
+            log.debug("Show list with ID {}", foundTodoList.id());
+
+            model.addAttribute("todoList", foundTodoList);
+            model.addAttribute("motivationMessage", motivationMessageService.computeMotivationMessage(foundTodoList.countTotal(), foundTodoList.countFinishedItems()));
+
+            return "list";
+        }
+
+        TodoListDto saved = todoListService.addTodoItem(id, todoItemForm);
+        log.debug("Saved a new item into a list (ID {})", saved.id());
+
+        return redirectToList(saved.id());
     }
 
     @GetMapping("/list/{list_id}/update/{item_id}")
     public String updateItem(@PathVariable("list_id") Long listId,
                              @PathVariable("item_id") Long itemId,
                              @RequestParam("finished") Boolean finished) {
-        TodoList updated = todoListService.updateTodoItem(listId, itemId, finished);
-        log.debug("Updated an item in a list with ID {}", updated.getId());
+        TodoListDto updated = todoListService.setTodoItemFinished(listId, itemId, finished);
+        log.debug("Updated an item in a list with ID {}", updated.id());
 
-        return redirectToList(updated.getId());
+        return redirectToList(updated.id());
     }
 
     @ExceptionHandler
