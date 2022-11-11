@@ -43,7 +43,7 @@ public class MotivationMessageServiceImpl implements MotivationMessageService {
         String output = "";
 
         if (total == 0) {
-            output += "";
+            output += emptyListMessage;
         } else if (total < manyItemsThreshold) {
             output += fewItemsMessage;
 
