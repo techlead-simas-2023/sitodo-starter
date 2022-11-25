@@ -19,7 +19,7 @@
         <tbody th:if="${todoList}">
         <tr th:object="${todoList}" th:each="item : ${todoList.items}">
             <td th:text="${item.id}">1</td>
-            <td th:text="${item.title}">Cook rice</td>
+            <td class="todo-item-title" th:text="${item.title}">Cook rice</td>
             <td th:text="${item.finished} ? 'Finished' : 'Not Finished'">Not Finished</td>
             <td th:if="${item.finished}">
                 <a class="sitodo-finish-link" th:href="@{/list/{list_id}/update/{item_id}(list_id=${todoList.id},item_id=${item.id},finished='false')}">
