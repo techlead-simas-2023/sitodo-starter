@@ -1,0 +1,17 @@
+# Ignore the following files & folders from being included into container image
+.github/
+.idea/
+.venv/
+build/
+site/
+target/
+
+/*.yml
+/*.toml
+.dockerignore
+.gitignore
+Dockerfile
+LICENSE
+
+# Do not ignore the following filse & folders:
+!mkdocs.yml

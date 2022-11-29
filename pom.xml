@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>sitodo</artifactId>
-	<version>0.2.1-SNAPSHOT</version>
+	<version>0.2.2-SNAPSHOT</version>
 	<name>sitodo</name>
 	<description>A basic todo app for teaching basic Web programming, Git workflows, and CI/CD. Heavily inspired by the
 		running example in &quot;Test-Driven Development with Python&quot; book by Harry Percival.
