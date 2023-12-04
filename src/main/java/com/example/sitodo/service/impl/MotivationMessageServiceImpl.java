@@ -51,8 +51,12 @@ public class MotivationMessageServiceImpl implements MotivationMessageService {
                 output += " " + allFinishedMessage;
             } else if (finished == 0) {
                 output += " " + noFinishedMessage;
-            } else if (finished < total && finished >= total / 2) {
-                output += " " + halfFinishedMessage;
+            } else if (finished < total) {
+                if (finished >= total / 2) {
+                    output += " " + halfFinishedMessage;
+                } else {
+                    output += someFinishedMessage;
+                }
             } else {
                 output += someFinishedMessage;
             }
@@ -63,8 +67,12 @@ public class MotivationMessageServiceImpl implements MotivationMessageService {
                 output += " " + allFinishedMessage;
             } else if (finished == 0) {
                 output += " " + noFinishedMessage;
-            } else if (finished < total && finished >= total / 2) {
-                output += " " + halfFinishedMessage;
+            } else if (finished < total) {
+                if (finished >= total / 2) {
+                    output += " " + halfFinishedMessage;
+                } else {
+                    output += someFinishedMessage;
+                }
             } else {
                 output += someFinishedMessage;
             }

@@ -6,13 +6,11 @@ on: [push, pull_request]
 jobs:
   test:
     name: Run all tests
-
     runs-on: ubuntu-22.04
-
     env:
       # Based on the Maven CI/CD template from GitLab:
       # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Maven.gitlab-ci.yml
-      # It is recommended to use these variables to reduce noise in the logs
+      # It is recommended to use these variables to reduce noise in the job logs
       MAVEN_OPTS: >
         -Dhttps.protocols=TLSv1.2
         -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
@@ -25,19 +23,6 @@ jobs:
         --show-version
         -DinstallAtEnd=true
         -DdeployAtEnd=true
-
-    # Based on the example at:
-    # https://github.com/actions/example-services/blob/master/.github/workflows/postgres-service.yml
-    services:
-      postgres:
-        image: docker.io/library/postgres:14.5-alpine3.16
-        env:
-          POSTGRES_USER: sitodo
-          POSTGRES_PASSWORD: 9BZ4S4Jt
-          POSTGRES_DB: sitodo
-        ports:
-          - 5432/tcp
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout repository
@@ -55,16 +40,8 @@ jobs:
         with:
           firefox-version: "latest-esr"
       - name: Run unit tests
-        env:
-          SPRING_DATASOURCE_URL: "jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/sitodo"
-          SPRING_DATASOURCE_USERNAME: sitodo
-          SPRING_DATASOURCE_PASSWORD: 9BZ4S4Jt
         run: mvn $MAVEN_CLI_OPTS test -Dgroups=unit -Djacoco.destFile=target/jacoco-unit.exec
       - name: Run functional tests
-        env:
-          SPRING_DATASOURCE_URL: "jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/sitodo"
-          SPRING_DATASOURCE_USERNAME: sitodo
-          SPRING_DATASOURCE_PASSWORD: 9BZ4S4Jt
         run: |
           mvn $MAVEN_CLI_OPTS test -Dgroups=e2e -Djacoco.destFile=target/jacoco-functional.exec
       - name: Merge code coverage reports
@@ -76,4 +53,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-

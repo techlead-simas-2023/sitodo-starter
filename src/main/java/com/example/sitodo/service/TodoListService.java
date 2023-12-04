@@ -1,6 +1,5 @@
 package com.example.sitodo.service;
 
-import com.example.sitodo.dto.TodoItemDto;
 import com.example.sitodo.dto.TodoListDto;
 import com.example.sitodo.form.TodoItemForm;
 import org.springframework.stereotype.Service;

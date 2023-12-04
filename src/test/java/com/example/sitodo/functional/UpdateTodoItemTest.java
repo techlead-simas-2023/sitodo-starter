@@ -27,24 +27,6 @@ class UpdateTodoItemTest extends BaseFunctionalTest {
         postNewTodoItem("Buy milk");
         checkItemsInList(List.of("Buy milk"));
 
-        // Note: It is getting tedious to use internal methods to verify items in the
-        // list. Due to this user story, we find out that we also need to check value
-        // in different column (i.e. the status and the link) beside the task's title.
-        // The list item verification method might need some refactoring in the future.
-        //
-        // For instance, if we want to verify columns in a row, maybe we can verify them
-        // like using Hamcrest's Matchers:
-        //
-        // WebElement row = driver.findElement(By.tagName("tr"));
-        // assertThatColumn(row,
-        //   () -> row[0].getText().matches("\\d+"),
-        //   () -> row[1].getText().equals("Buy milk"),
-        //   () -> row[2].getText().equals("Not Finished")
-        // );
-        //
-        // I guess it looks better if we can allow verification procedures (strategy)
-        // can be given into the assertion method dynamically.
-
         // Mark the item as finished
         WebElement markFinishLink = $(By.className("sitodo-finish-link"));
         markFinishLink.click();
