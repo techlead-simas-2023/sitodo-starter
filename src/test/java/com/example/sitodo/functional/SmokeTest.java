@@ -9,7 +9,7 @@ import static com.codeborne.selenide.Selenide.title;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Smoke Test")
-@Tag("e2e")
+@Tag("func")
 class SmokeTest extends BaseFunctionalTest {
 
     @Test

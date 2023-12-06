@@ -14,7 +14,7 @@ import static com.codeborne.selenide.Selenide.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("User Story 2: Update Todo Item")
-@Tag("e2e")
+@Tag("func")
 @Transactional
 class UpdateTodoItemTest extends BaseFunctionalTest {
 

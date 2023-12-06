@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @DisplayName("User Story 3: See Motivation Message")
-@Tag("e2e")
+@Tag("func")
 class SeeMotivationMessageTest extends BaseFunctionalTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(SeeMotivationMessageTest.class);

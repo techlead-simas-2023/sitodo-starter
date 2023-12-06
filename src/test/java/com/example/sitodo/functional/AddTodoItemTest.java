@@ -13,7 +13,7 @@ import static com.codeborne.selenide.Selenide.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("User Story 1: Add Todo Item")
-@Tag("e2e")
+@Tag("func")
 @Transactional
 class AddTodoItemTest extends BaseFunctionalTest {
 
