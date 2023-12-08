@@ -40,46 +40,47 @@ public class MotivationMessageServiceImpl implements MotivationMessageService {
     public String computeMotivationMessage(long total, long finished) {
         log.debug("Total Items: {}; Total Finished Items: {}", total, finished);
 
-        String output = ""; // TODO: Replace with StringBuffer / StringBuilder
+        StringBuilder output = new StringBuilder();
 
+        // The following conditional blocks are intentionally bad to illustrate code example with high cognitive complexity.
         if (total == 0) {
-            output += emptyListMessage;
+            output.append(emptyListMessage);
         } else if (total < manyItemsThreshold) {
-            output += fewItemsMessage;
+            output.append(fewItemsMessage);
 
             if (finished == total) {
-                output += " " + allFinishedMessage;
+                output.append(" ").append(allFinishedMessage);
             } else if (finished == 0) {
-                output += " " + noFinishedMessage;
+                output.append(" ").append(noFinishedMessage);
             } else if (finished < total) {
                 if (finished >= total / 2) {
-                    output += " " + halfFinishedMessage;
+                    output.append(" ").append(halfFinishedMessage);
                 } else {
-                    output += someFinishedMessage;
+                    output.append(someFinishedMessage);
                 }
             } else {
-                output += someFinishedMessage;
+                output.append(someFinishedMessage);
             }
         } else {
-            output += manyItemsMessage;
+            output.append(manyItemsMessage);
 
             if (finished == total) {
-                output += " " + allFinishedMessage;
+                output.append(allFinishedMessage);
             } else if (finished == 0) {
-                output += " " + noFinishedMessage;
+                output.append(" ").append(noFinishedMessage);
             } else if (finished < total) {
                 if (finished >= total / 2) {
-                    output += " " + halfFinishedMessage;
+                    output.append(" ").append(halfFinishedMessage);
                 } else {
-                    output += someFinishedMessage;
+                    output.append(someFinishedMessage);
                 }
             } else {
-                output += someFinishedMessage;
+                output.append(someFinishedMessage);
             }
         }
 
-        log.debug("Resulting output: {}", output);
+        log.debug("Resulting output: {}", output.toString());
 
-        return output;
+        return output.toString();
     }
 }

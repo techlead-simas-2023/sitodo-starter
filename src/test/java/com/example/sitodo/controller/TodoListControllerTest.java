@@ -12,18 +12,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TodoListController.class)
@@ -119,6 +123,52 @@ class TodoListControllerTest {
         // object that supposedly has been modified to the controller. The controller
         // will use the mock object from service layer as input for the view layer.
         // The view layer then use the mock object as data model for rendering the HTML.
+    }
+
+    @Test
+    @DisplayName("HTTP POST /list successfully added a new item")
+    void newItem_ok() throws Exception {
+        when(todoListService.addTodoItem(any())).thenReturn(new TodoListDto(1L, Collections.emptyList()));
+
+        mockMvc.perform(
+            post("/list")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("title", "Touch grass")
+        ).andExpectAll(status().is3xxRedirection());
+    }
+
+    @Test
+    @DisplayName("HTTP POST /list rejected invalid item")
+    void newItem_invalid() throws Exception {
+        mockMvc.perform(
+            post("/list")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("title", "")
+        ).andExpectAll(status().isOk());
+    }
+
+    @Test
+    @DisplayName("HTTP POST /list/{id} successfully added a new item into a list")
+    void newItem_withId_ok() throws Exception {
+        when(todoListService.addTodoItem(anyLong(), any())).thenReturn(new TodoListDto(1L, Collections.emptyList()));
+
+        mockMvc.perform(
+            post("/list/1")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("title", "Buy milk")
+        ).andExpectAll(status().is3xxRedirection());
+    }
+
+    @Test
+    @DisplayName("HTTP POST /list/{id} rejected invalid item")
+    void newItem_withId_invalid() throws Exception {
+        when(todoListService.getTodoListById(1L)).thenReturn(new TodoListDto(1L, Collections.emptyList()));
+
+        mockMvc.perform(
+            post("/list/1")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("title", "")
+        ).andExpectAll(status().isOk());
     }
 
     private TodoList createMockTodoList(Long id, TodoItem... items) {
