@@ -3,10 +3,8 @@ name: Reporting
 
 on:
   workflow_run:
-    types: [completed]
-    workflows:
-      - Continuous Integration (CI)
-      - BDD
+    types: [ completed ]
+    workflows: [ BDD ]
 
 permissions:
   contents: write
@@ -18,16 +16,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Download test reports
-        uses: actions/download-artifact@v3
+      - name: Download CI reports
+        uses: dawidd6/action-download-artifact@v2.9.0
         with:
-          path: tmp
-      - name: Organise test reports
+          branch: main
+          name: surefire-jacoco-reports
+          path: target/site
+          workflow: ci.yml
+      - name: Download BDD test reports
+        uses: dawidd6/action-download-artifact@v2.9.0
+        with:
+          branch: main
+          name: serenity-reports
+          path: target/site/serenity
+          workflow: bdd.yml
+      - name: Add top-level test reporting page
         run: |
-          mkdir -p target/site
-          mv tmp/surefire-jacoco-reports/surefire target/site/surefire
-          mv tmp/surefire-jacoco-reports/jacoco target/site/jacoco
-          mv tmp/serenity-reports/serenity target/site/serenity
           cp .github/pages/index.html target/site/index.html
       - name: Publish test reports
         uses: JamesIves/github-pages-deploy-action@v4.5.0
