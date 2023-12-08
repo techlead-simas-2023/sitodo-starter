@@ -1,8 +1,6 @@
 ---
 name: BDD
 
-# TODO: Only run after successful deployment of the main branch
-# Reference: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run
 on:
   deployment_status
 
@@ -47,8 +45,10 @@ jobs:
       - name: Run tests
         run: |
           mvn -P bdd clean verify
-      - name: Publish Serenity test report
-        uses: JamesIves/github-pages-deploy-action@4.1.1
+      - name: Save test reports as artifact
+        uses: actions/upload-artifact@v3
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: target/site/serenity # The folder the action should deploy.
+          name: serenity-reports
+          path: |
+            target/site/serenity/
+          retention-days: 1

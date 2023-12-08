@@ -40,7 +40,7 @@ public class MotivationMessageServiceImpl implements MotivationMessageService {
     public String computeMotivationMessage(long total, long finished) {
         log.debug("Total Items: {}; Total Finished Items: {}", total, finished);
 
-        String output = "";
+        String output = ""; // TODO: Replace with StringBuffer / StringBuilder
 
         if (total == 0) {
             output += emptyListMessage;

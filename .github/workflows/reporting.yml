@@ -1,0 +1,36 @@
+---
+name: Reporting
+
+on:
+  workflow_run:
+    types: [completed]
+    workflows:
+      - Continuous Integration (CI)
+      - BDD
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    name: Publish test reports
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Download test reports
+        uses: actions/download-artifact@v3
+        with:
+          path: tmp
+      - name: Organise test reports
+        run: |
+          mkdir -p target/site
+          mv tmp/surefire-jacoco-reports/surefire target/site/surefire
+          mv tmp/surefire-jacoco-reports/jacoco target/site/jacoco
+          mv tmp/serenity-reports/serenity target/site/serenity
+          cp .github/pages/index.html target/site/index.html
+      - name: Publish test reports
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        with:
+          branch: gh-pages
+          folder: target/site

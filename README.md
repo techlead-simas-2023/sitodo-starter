@@ -1,7 +1,7 @@
 # Sitodo
 
-[![pipeline status](https://gitlab.com/addianto/sitodo/badges/main/pipeline.svg)](https://gitlab.com/addianto/sitodo/-/commits/main)
-[![coverage report](https://gitlab.com/addianto/sitodo/badges/main/coverage.svg)](https://gitlab.com/addianto/sitodo/-/commits/main)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=addianto_sitodo&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=addianto_sitodo)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=addianto_sitodo&metric=coverage)](https://sonarcloud.io/summary/new_code?id=addianto_sitodo)
 
 A basic todo app project for teaching basic Web programming, Git workflows, and
 CI/CD. Heavily inspired by the running example in "Test-Driven Development with
