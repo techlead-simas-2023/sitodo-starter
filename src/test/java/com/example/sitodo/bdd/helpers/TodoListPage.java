@@ -24,4 +24,8 @@ public class TodoListPage extends PageObject {
     public static Target ITEMS_LIST = Target
         .the("item list")
         .located(By.xpath("//tbody/tr/td[contains(@class, 'todo-item-title')]"));
+
+    public static Target ITEMS_ROWS = Target
+        .the("rows in the item list table")
+        .located(By.xpath("//tbody/tr"));
 }
