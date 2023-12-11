@@ -1,7 +1,5 @@
-# Sitodo
+# Sitodo Starter Code
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=addianto_sitodo&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=addianto_sitodo)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=addianto_sitodo&metric=coverage)](https://sonarcloud.io/summary/new_code?id=addianto_sitodo)
 
 A basic todo app project for teaching basic Web programming, Git workflows, code quality,
 and CI/CD. Heavily inspired by the running example in "Test-Driven Development with Python" book by Harry Percival.
@@ -10,8 +8,8 @@ and CI/CD. Heavily inspired by the running example in "Test-Driven Development w
 
 The following tools need to be installed in order to build and run the project:
 
--  [Java 17 JDK (Java Development Kit)](https://adoptium.net)
--  [Apache Maven 3.8.5](https://maven.apache.org/download.cgi)
+-  [Java 17 JDK (Java Development Kit)](https://adoptium.net/installation/)
+-  (optional) [Apache Maven 3.8.5](https://maven.apache.org/download.cgi)
 -  [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/)
    - Required by the functional (Selenium) test suite
 
@@ -40,18 +38,18 @@ reporting from within IntelliJ.
 To run the whole test suite, execute:
 
 ```shell
-mvn test
+./mvnw test
 ```
 
 > To run a select test suite, e.g. unit or functional test, add `-Dgroups`
 > parameter. For example, to run only the unit test suite, execute
 > `mvn test -Dgroups=unit`.  Similarly, to run only the functional test suite,
-> execute `mvn test -Dgroups=e2e`.
+> execute `mvn test -Dgroups=func`.
 
 To build an executable Spring Boot application, execute:
 
 ```shell
-mvn package -DskipTests
+./mvnw package -DskipTests
 ```
 
 > The `-DskipTests` option lets `package` task to build the app into executable
@@ -73,9 +71,11 @@ configuration in the [source code](./src/main/resources/application.properties).
 
 ## Running Example
 
-See the running example based on the main branch at [Heroku](https://sitodo-example.herokuapp.com).
+See the running example based on the upstream's main branch at [Heroku](https://sitodo-266ffc49fca9.herokuapp.com/)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=addianto_sitodo&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=addianto_sitodo)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=addianto_sitodo&metric=coverage)](https://sonarcloud.io/summary/new_code?id=addianto_sitodo)
 
 ## License
 
-This project is licensed under the terms of the [MIT license](./LICENSE). The
-included [static site](./docs) is licensed under [Creative Commons Attribution-ShareAlike 4.0](./docs/LICENSE).
+This project is licensed under the terms of the [MIT license](./LICENSE).
