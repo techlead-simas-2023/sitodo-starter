@@ -40,6 +40,8 @@ jobs:
           npm i puppeteer
           npx @puppeteer/browsers install chrome@stable
       - name: Configure webdriver base URL
+        # TODO: Ganti URL https://sitodo-... di pemanggilan `sed` dengan alamat aplikasi Sitodo versi anda di Heroku
+        # Saat ini URL masih mengarah ke Sitodo versi upstream/asli.
         run: |
           sed -i "s#http://localhost:8080#https://sitodo-266ffc49fca9.herokuapp.com#" src/test/resources/serenity.conf
       - name: Run tests
